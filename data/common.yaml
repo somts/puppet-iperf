@@ -1,0 +1,36 @@
+---
+iperf::ensure: present
+iperf::firewall_manage: true
+iperf::group: iperf3
+iperf::interval: 10
+iperf::logrotate_manage: true
+iperf::package: iperf3
+iperf::path:
+iperf::service_enable: true
+iperf::service_ensure: running
+iperf::service_name: iperf3
+iperf::user: iperf3
+
+iperf::config::logdir:
+iperf::config::logfilename:
+iperf::config::piddir:
+iperf::config::pidfilename:
+
+# GENERAL OPTIONS
+iperf::config::affinity:
+iperf::config::bind:
+iperf::config::debug: false
+iperf::config::file:
+iperf::config::forceflush: false
+iperf::config::format:
+iperf::config::interval: 1
+iperf::config::json: false
+iperf::config::port: 5201
+iperf::config::verbose: false
+
+# SERVER SPECIFIC OPTIONS
+iperf::config::authorized_users_path:
+iperf::config::one_off:
+iperf::config::pidfile:
+iperf::config::rsa_private_key_path:
+...

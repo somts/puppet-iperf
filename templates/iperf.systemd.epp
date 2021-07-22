@@ -1,0 +1,18 @@
+# Managed by Puppet. DO NOT EDIT.
+[Unit]
+Description=<%= $service_name %> server
+After=auditd.service network.target
+
+[Service]
+ExecStart=<%= $path %><% $exec_args.each |$key, $val| { %><% if $val =~ Boolean { if $val == true { %> <%= $key %><% } } else { %> <%= $key %>=<%= $val %><% } } %>
+Group=<%= $group %>
+PIDFile=<%= $pidfile %>
+Restart=on-failure
+RestartSec=300
+SuccessExitStatus=0
+TimeoutStopSec=120
+Type=forking
+User=<%= $user %>
+
+[Install]
+WantedBy=multi-user.target
