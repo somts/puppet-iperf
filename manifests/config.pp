@@ -1,22 +1,22 @@
 # Manage an iperf feature/service
 class iperf::config(
   Integer[1-65535] $port,
-  Variant[Undef,Enum['k','m','g','t','K','M','G','T']] $format,
+  Variant[Enum['k','m','g','t','K','M','G','T'], Undef] $format,
   Integer $interval,
-  Variant[Undef,Stdlib::Absolutepath] $file,
-  Variant[Undef,Integer] $affinity,
-  Variant[Undef,Stdlib::IP::Address] $bind,
+  Variant[Stdlib::Absolutepath, Undef] $file,
+  Variant[Integer, Undef] $affinity,
+  Variant[Stdlib::IP::Address, Undef] $bind,
   Boolean $verbose,
   Boolean $json,
-  Variant[Undef,Stdlib::Absolutepath] $logdir,
-  Variant[Undef,String] $logfilename,
+  Variant[Stdlib::Absolutepath, Undef] $logdir,
+  Variant[String, Undef] $logfilename,
   Boolean $forceflush,
   Boolean $debug,
-  Variant[Undef,String] $pidfilename,
-  Variant[Undef,Stdlib::Absolutepath] $piddir,
-  Variant[Undef,Stdlib::Absolutepath] $one_off,
-  Variant[Undef,Stdlib::Absolutepath] $rsa_private_key_path,
-  Variant[Undef,Stdlib::Absolutepath] $authorized_users_path,
+  Variant[String, Undef] $pidfilename,
+  Variant[Stdlib::Absolutepath, Undef] $piddir,
+  Variant[Stdlib::Absolutepath, Undef] $one_off,
+  Variant[Stdlib::Absolutepath, Undef] $rsa_private_key_path,
+  Variant[Stdlib::Absolutepath, Undef] $authorized_users_path,
 ) {
   # VARIABLES
   $_logdir = $logdir ? {
@@ -35,6 +35,9 @@ class iperf::config(
     undef   => "${_piddir}/${iperf::service_name}.pid",
     default => "${_piddir}/${pidfilename}",
   }
+  # When/if we support non-Linux platforms, such (FreeBSD/Windows/etc?)
+  # this variable will need adjustment.
+  $postrotate = "/bin/systemctl restart ${iperf::service_name}"
 
   # MANAGED RESOURCES
   group { $iperf::group:
@@ -96,10 +99,32 @@ class iperf::config(
     }),
   }
 
-  # TODO firewall
-  #if $iperf::firewall_manage {
-  #}
-  # TODO logrotate
-  #if $iperf::logrotate_manage {
-  #}
+  if $iperf::firewall_manage {
+    firewall {
+      "${iperf::firewall_order} ${iperf::service_name} TCP":
+        action => 'accept',
+        chain  => $iperf::firewall_chain,
+        dport  => $port,
+        proto  => 'tcp',;
+      "${iperf::firewall_order} ${iperf::service_name} UDP":
+        action => 'accept',
+        chain  => $iperf::firewall_chain,
+        dport  => $port,
+        proto  => 'udp',;
+    }
+  }
+
+  if $iperf::logrotate_manage {
+    logrotate::rule { $iperf::service_name :
+      compress      => true,
+      delaycompress => true,
+      missingok     => true,
+      path          => $logfile,
+      postrotate    => $postrotate,
+      rotate        => $iperf::logrotate_rotate,
+      rotate_every  => $iperf::logrotate_rotate_every,
+      su_user       => $iperf::user,
+      su_group      => $iperf::group,
+    }
+  }
 }

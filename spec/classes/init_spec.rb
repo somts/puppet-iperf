@@ -37,6 +37,35 @@ describe 'iperf' do
         content: %r{\nExecStart=/usr/bin/iperf3 --daemon --interval=1},
       )
     }
+    it {
+      is_expected.to contain_firewall('052 iperf3 TCP').with(
+        action: 'accept',
+        chain: nil,
+        dport: 5201,
+        proto: 'tcp',
+      )
+    }
+    it {
+      is_expected.to contain_firewall('052 iperf3 UDP').with(
+        action: 'accept',
+        chain: nil,
+        dport: 5201,
+        proto: 'udp',
+      )
+    }
+    it {
+      is_expected.to contain_logrotate__rule('iperf3').with(
+        compress: true,
+        delaycompress: true,
+        missingok: true,
+        path: '/var/log/iperf3/iperf3.log',
+        postrotate: '/bin/systemctl restart iperf3',
+        rotate: 7,
+        rotate_every: 'day',
+        su_group: 'iperf3',
+        su_user: 'iperf3',
+      )
+    }
 
     # Service
     it { is_expected.to contain_class('iperf::service') }

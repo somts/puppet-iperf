@@ -4,5 +4,6 @@
 fixtures:
   forge_modules:
     logrotate: "puppet/logrotate"
+    firewall: "puppetlabs/firewall"
     stdlib: "puppetlabs/stdlib"
     systemd: "camptocamp/systemd"

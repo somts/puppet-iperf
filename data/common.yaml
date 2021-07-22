@@ -1,9 +1,13 @@
 ---
 iperf::ensure: present
 iperf::firewall_manage: true
+iperf::firewall_chain:
+iperf::firewall_order: '052'
 iperf::group: iperf3
 iperf::interval: 10
 iperf::logrotate_manage: true
+iperf::logrotate_rotate: 7
+iperf::logrotate_rotate_every: day
 iperf::package: iperf3
 iperf::path:
 iperf::service_enable: true
@@ -11,6 +15,7 @@ iperf::service_ensure: running
 iperf::service_name: iperf3
 iperf::user: iperf3
 
+## CONFIG CLASS
 iperf::config::logdir:
 iperf::config::logfilename:
 iperf::config::piddir:

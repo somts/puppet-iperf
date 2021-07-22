@@ -1,13 +1,17 @@
 # Manage an iperf installation
 class iperf(
-  Enum[present,absent] $ensure,
+  Enum['present', 'absent'] $ensure,
   Variant[Array, String] $package,
-  Enum[iperf,iperf3] $service_name,
-  Enum[running,stopped] $service_ensure,
+  Enum['iperf', 'iperf3'] $service_name,
+  Enum['running', 'stopped'] $service_ensure,
   Boolean $service_enable,
   Boolean $logrotate_manage,
+  Integer $logrotate_rotate,
+  Enum['day', 'week', 'month'] $logrotate_rotate_every,
   Boolean $firewall_manage,
-  Variant[Undef,Stdlib::Absolutepath] $path,
+  Variant[String, Undef] $firewall_chain,
+  String $firewall_order,
+  Variant[Stdlib::Absolutepath, Undef] $path,
   String $user,
   String $group,
 ) {
