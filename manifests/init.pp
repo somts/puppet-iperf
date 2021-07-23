@@ -2,6 +2,7 @@
 class iperf(
   Enum['present', 'absent'] $ensure,
   Variant[Array, String] $package,
+  Boolean $package_manage,
   Enum['iperf', 'iperf3'] $service_name,
   Enum['running', 'stopped'] $service_ensure,
   Boolean $service_enable,

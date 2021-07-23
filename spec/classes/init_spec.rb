@@ -12,6 +12,14 @@ describe 'iperf' do
     }
     it { is_expected.to contain_package('iperf3') }
 
+    context 'with package_manage = false' do
+      let :params do
+        { package_manage: false }
+      end
+
+      it { is_expected.not_to contain_package('iperf3') }
+    end
+
     # Config
     it {
       is_expected.to contain_class('iperf::config').that_notifies(
@@ -53,7 +61,16 @@ describe 'iperf' do
         proto: 'udp',
       )
     }
-    it {
+    context 'with firewall_manage = false' do
+      let :params do
+        { firewall_manage: false }
+      end
+
+      it do is_expected.not_to contain_firewall('052 iperf3 TCP') end
+      it do is_expected.not_to contain_firewall('052 iperf3 UDP') end
+    end
+
+    it do
       is_expected.to contain_logrotate__rule('iperf3').with(
         compress: true,
         delaycompress: true,
@@ -65,7 +82,28 @@ describe 'iperf' do
         su_group: 'iperf3',
         su_user: 'iperf3',
       )
-    }
+    end
+
+    context 'with logrotate_manage = false' do
+      let :params do
+        { logrotate_manage: false }
+      end
+
+      it do is_expected.not_to contain_logrotate__rule('iperf3') end
+    end
+
+    context 'with logrotate tunes' do
+      let :params do
+        { logrotate_rotate: 30, logrotate_rotate_every: 'week' }
+      end
+
+      it do
+        is_expected.to contain_logrotate__rule('iperf3').with(
+          rotate: 30,
+          rotate_every: 'week',
+        )
+      end
+    end
 
     # Service
     it { is_expected.to contain_class('iperf::service') }
@@ -75,6 +113,18 @@ describe 'iperf' do
         enable: true,
       )
     }
+    context 'with service_ensure = stopped and service_enable = stopped' do
+      let :params do
+        { service_ensure: 'stopped', service_enable: false }
+      end
+
+      it do
+        is_expected.to contain_service('iperf3').with(
+          ensure: 'stopped',
+          enable: false,
+        )
+      end
+    end
   end
 
   shared_examples 'Linux' do

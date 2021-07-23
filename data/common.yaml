@@ -9,6 +9,7 @@ iperf::logrotate_manage: true
 iperf::logrotate_rotate: 7
 iperf::logrotate_rotate_every: day
 iperf::package: iperf3
+iperf::package_manage: true
 iperf::path:
 iperf::service_enable: true
 iperf::service_ensure: running
